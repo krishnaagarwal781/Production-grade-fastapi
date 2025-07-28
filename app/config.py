@@ -7,7 +7,8 @@ ENV = os.getenv("ENV", "development")
 if ENV == "production":
     load_dotenv(".env.production")
 elif ENV == "testing":
-    load_dotenv(".env.testing")
+    pass
+    # load_dotenv(".env.testing")
 else:
     load_dotenv(".env.development")
 

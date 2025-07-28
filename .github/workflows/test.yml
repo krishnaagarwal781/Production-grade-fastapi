@@ -10,11 +10,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      mongo:
-        image: mongo:latest
-        ports:
-          - 27017:27017
+    # Remove the 'services' block if you are connecting to externally deployed services.
+    # If you still need some services locally (e.g., a mock S3 for MinIO if you don't want
+    # to hit the real MinIO, or if some tests need a local Redis), you can keep them here.
+    # For this example, we're assuming ALL services are external.
+    # services:
+    #   mongo:
+    #     image: mongo:latest
+    #     ports:
+    #       - 27017:27017
 
     steps:
       - uses: actions/checkout@v3
@@ -29,9 +33,40 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Configure and Run tests
+        # Define environment variables for your deployed testing services here.
+        # Use GitHub Secrets for sensitive information like passwords.
         env:
-          ENV: testing
-          PYTHONPATH: ${{ github.workspace }}
+          ENV: testing # This tells your app it's in a testing environment
+          PYTHONPATH: ${{ github.workspace }} # Essential for Python to find your 'app' module
+
+          # Connection details for your deployed MongoDB test instance
+          # This MONGO_URI will be loaded from your GitHub Secrets.
+          MONGO_URI: ${{ secrets.MONGO_TEST_URI }} # <--- Added from GitHub Secret
+
+          # Example for other services (replace with your actual deployed details)
+          # CLICKHOUSE_HOST: your-deployed-clickhouse-host
+          # CLICKHOUSE_PORT: 9000
+          # CLICKHOUSE_USER: ci_user
+          # CLICKHOUSE_PASSWORD: ${{ secrets.CLICKHOUSE_CI_PASSWORD }} # Use a secret!
+          # RABBITMQ_HOST: your-deployed-rabbitmq-host
+          # RABBITMQ_PORT: 5672
+          # RABBITMQ_USER: ci_user
+          # RABBITMQ_PASS: ${{ secrets.RABBITMQ_CI_PASSWORD }} # Use a secret!
+          # MINIO_ENDPOINT: http://your-deployed-minio-host:9000
+          # MINIO_ACCESS_KEY: ${{ secrets.MINIO_CI_ACCESS_KEY }}
+          # MINIO_SECRET_KEY: ${{ secrets.MINIO_CI_SECRET_KEY }}
+
         run: |
+          # --- IMPORTANT: Add pre-test cleanup for your deployed services ---
+          # This is CRUCIAL to ensure test isolation and prevent data leakage/interference.
+          # You'll need Python scripts (or other tools) to connect to your deployed
+          # services and clear out any data from previous test runs.
+          echo "Running pre-test cleanup on deployed services..."
+          python scripts/cleanup_test_env.py # Example: a script that connects and truncates/deletes data
+
+          # Run your pytest suite
           pytest
+
+          # --- Optional: Add post-test cleanup if needed (e.g., for temporary files) ---
+          echo "Running post-test cleanup..."
