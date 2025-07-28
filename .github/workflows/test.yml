@@ -58,13 +58,6 @@ jobs:
           # MINIO_SECRET_KEY: ${{ secrets.MINIO_CI_SECRET_KEY }}
 
         run: |
-          # --- IMPORTANT: Add pre-test cleanup for your deployed services ---
-          # This is CRUCIAL to ensure test isolation and prevent data leakage/interference.
-          # You'll need Python scripts (or other tools) to connect to your deployed
-          # services and clear out any data from previous test runs.
-          echo "Running pre-test cleanup on deployed services..."
-          python scripts/cleanup_test_env.py # Example: a script that connects and truncates/deletes data
-
           # Run your pytest suite
           pytest
 
