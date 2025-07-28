@@ -7,8 +7,7 @@ ENV = os.getenv("ENV", "development")
 if ENV == "production":
     load_dotenv(".env.production")
 elif ENV == "testing":
-    pass
-    # load_dotenv(".env.testing")
+    load_dotenv(".env.testing")
 else:
     load_dotenv(".env.development")
 
@@ -17,5 +16,6 @@ class Settings(BaseSettings):
     MONGO_URI: str
     DEBUG: bool = False
     ENV: str = ENV
+
 
 settings = Settings()
