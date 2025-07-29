@@ -1,21 +1,64 @@
-to change the environment use this:
 
-$env:ENV="testing";
+# Backend Dev & Deployment Cheatsheet
 
-to run test cases run:
+## 1. Local Environment Variables (FastAPI with Pydantic Settings)
 
+### Windows (PowerShell)
+```powershell
+$env:ENV_FILE=".env.testing"
+# Or for a single variable:
+$env:MY_SETTING="some_value"
+```
+
+### Linux/macOS (Bash/Zsh)
+```bash
+export ENV_FILE=".env.testing"
+# Or for a single variable:
+export MY_SETTING="some_value"
+```
+
+---
+
+## 2. Running Tests
+
+```bash
 python -m pytest
+```
 
-deploy
+---
 
-tagging
+## 3. Git Tagging for Deployments (Annotated Tags for Releases)
 
-git tag -a v0.0.1 -m "Testing first version of tagging"
-git tag
-git show v0.0.1
-# Tag an older commit, let's say commit B's hash is 'b0b0b0'
-git tag -a v0.9.0 -m "Pre-release before official 1.0.0" b0b0b0
+### Create a Tag (on current branch's latest commit)
+```bash
+# Ensure local branch is up-to-date first
+git checkout main
+git pull origin main
+git tag -a v0.0.1 -m "My release message"
+```
 
-git push origin v1.0.0
+### Verify Local Tags
+```bash
+git tag         # List all local tags
+git show v0.0.1 # Show tag details
+```
 
-git push origin --tags
+### Push Tags to GitHub
+```bash
+git push origin v0.0.1      # Push a specific tag
+git push origin --tags      # Push all local tags
+```
+
+### Delete Tags
+
+#### Delete Local Tag
+```bash
+git tag -d v1.0.0
+```
+
+#### Delete Remote Tag (on GitHub)
+```bash
+git push origin :v1.0.0      # (Note the colon)
+# OR
+git push --delete origin v1.0.0
+```
